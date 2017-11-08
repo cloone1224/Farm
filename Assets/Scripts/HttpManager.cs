@@ -10,7 +10,8 @@ public class HttpManager : MonoBehaviour {
     {
         if (instance != null)
         {
-            Debug.LogError("More than HttpManager instance.");
+            Debug.LogError("More than one instance of HttpManager found!");
+            DestroyImmediate(this);
             return;
         }
 

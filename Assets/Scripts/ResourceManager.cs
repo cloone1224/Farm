@@ -17,6 +17,7 @@ public class ResourceManager : MonoBehaviour {
         if (instance != null)
         {
             Debug.LogError("More than one ResourceManager");
+            DestroyImmediate(this);
             return;
         }
 
