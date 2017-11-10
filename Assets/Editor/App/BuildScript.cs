@@ -5,14 +5,15 @@ using System.Collections.Generic;
 using UnityEditor;
 #endif
 
-// Unity3D 메뉴 Build에 Build 메뉴를 추가하여 현재 설정되어 있는 플랫폼에 맞는 빌드를 수행해준다.
-public class BuildScript : MonoBehaviour {
-
 #if UNITY_EDITOR
+// Unity3D 메뉴 Build에 Build 메뉴를 추가하여 현재 설정되어 있는 플랫폼에 맞는 빌드를 수행해준다.
+public class BuildScript {
+
     private static readonly string[] scenes;
     private static readonly string targetDir = "Build";
     
     private static string projectPath;
+    private static string buildPath;
 
     static BuildScript()
     {
@@ -20,10 +21,11 @@ public class BuildScript : MonoBehaviour {
 
         PlayerSettings.productName = gameConfig.ProductName;
         //PlayerSettings.bundleIdentifier = gameConfig.BundleName;
-        PlayerSettings.applicationIdentifier = gameConfig.BundleName;
+        //PlayerSettings.applicationIdentifier = gameConfig.BundleName;
         PlayerSettings.bundleVersion = gameConfig.GetVersionName();
 
         projectPath = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/'));
+        buildPath = string.Format("{0}/{1}", projectPath, targetDir);
 
         scenes = FindEnabledEditorScenes();
     }
@@ -49,20 +51,20 @@ public class BuildScript : MonoBehaviour {
 
     static void BuildWindows(BuildTarget buildTarget)
     {
-        string outputPath = string.Format("{0}/windows32", projectPath);
+        string outputPath = string.Format("{0}/windows32", buildPath);
 
         CreateDirectory(outputPath);
 
         string executeName = string.Format("{0}.exe", PlayerSettings.productName);
+        string targetDir = string.Format("{0}/{1}", outputPath, executeName);
 
         BuildOptions buildOptions = GetBuildOptions();
-
-        bool success = ProcessBuild(scenes, string.Format("{0}/{1}", outputPath, executeName), buildTarget, buildOptions);
+        bool success = ProcessBuild(scenes, targetDir, buildTarget, buildOptions);
 
         if (success)
         {
             // 실행
-            RunBuild(executeName);
+            RunBuild(targetDir);
         }
     }
 
@@ -78,15 +80,18 @@ public class BuildScript : MonoBehaviour {
 
     static void BuildAndroid()
     {
-        string outputPath = string.Format("{0}/android", projectPath);
+        string outputPath = string.Format("{0}/android", buildPath);
 
         CreateDirectory(outputPath);
+
+        string executeName = string.Format("{0}.apk", PlayerSettings.productName);
+        string targetDir = string.Format("{0}/{1}", outputPath, executeName);
 
         GameManager.GameConfigInfo gameConfig = GameManager.Instance.GameConfig;
 
         PlayerSettings.Android.bundleVersionCode = gameConfig.VersionCode;
         
-        string keystorePath = string.Format("{0}/helper/android_keystore/{1}", projectPath, gameConfig.KeystoreName);
+        string keystorePath = string.Format("{0}/helper/android_keystore/{1}", buildPath, gameConfig.KeystoreName);
 
         PlayerSettings.Android.keystoreName = keystorePath;
         PlayerSettings.Android.keystorePass = gameConfig.KeyaliasPass;
@@ -94,8 +99,7 @@ public class BuildScript : MonoBehaviour {
         PlayerSettings.Android.keyaliasPass = gameConfig.KeyaliasPass;
 
         BuildOptions buildOptions = GetBuildOptions();
-
-        bool success = ProcessBuild(scenes, string.Format("{0}/{1}.apk", outputPath, PlayerSettings.productName), BuildTarget.Android, buildOptions);
+        bool success = ProcessBuild(scenes, targetDir, BuildTarget.Android, buildOptions);
 
         if (success)
         {
@@ -105,7 +109,7 @@ public class BuildScript : MonoBehaviour {
 
     static void BuildiOS()
     {
-        string outputPath = string.Format("{0}/ios", projectPath);
+        string outputPath = string.Format("{0}/ios", buildPath);
 
         CreateDirectory(outputPath);
 
@@ -138,15 +142,16 @@ public class BuildScript : MonoBehaviour {
 
     static void BuildOSX()
     {
-        string outputPath = string.Format("{0}/osx", projectPath);
+        string outputPath = string.Format("{0}/osx", buildPath);
 
         CreateDirectory(outputPath);
 
         string executeName = string.Format("{0}.app", PlayerSettings.productName);
+        string targetDir = string.Format("{0}/{1}", outputPath, executeName);
 
         BuildOptions buildOptions = GetBuildOptions();
 
-        bool success = ProcessBuild(scenes, string.Format("{0}/{1}", outputPath, executeName), BuildTarget.StandaloneOSXUniversal, buildOptions);
+        bool success = ProcessBuild(scenes, targetDir, BuildTarget.StandaloneOSXUniversal, buildOptions);
 
         if (success)
         {
@@ -208,20 +213,16 @@ public class BuildScript : MonoBehaviour {
     {
         System.Diagnostics.Process process = new System.Diagnostics.Process();
         
-        string projectPath = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/'));
-
-        process.StartInfo.FileName = string.Format("{0}/{1}/{2}", projectPath, targetDir, executeName);
+        process.StartInfo.FileName = executeName;
         process.Start();
     }
 
     private static bool CreateDirectory(string directory)
     {
-        string path = string.Format("{0}/{1}", Application.dataPath.Substring(0, Application.dataPath.LastIndexOf('/')), directory);
-
-        if (System.IO.Directory.Exists(path))
+        if (System.IO.Directory.Exists(directory))
             return true;
 
-        System.IO.DirectoryInfo directoryInfo = System.IO.Directory.CreateDirectory(path);
+        System.IO.DirectoryInfo directoryInfo = System.IO.Directory.CreateDirectory(directory);
         return directoryInfo != null;
     }
 
@@ -238,7 +239,5 @@ public class BuildScript : MonoBehaviour {
 
         return buildOptions;
     }
-
-#endif
-
 }
+#endif

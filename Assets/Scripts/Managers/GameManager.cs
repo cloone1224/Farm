@@ -3,6 +3,7 @@ using System;
 
 public class GameManager : SingletonGameObject<GameManager> {
 
+    #region Game Config
     [Serializable]
     public struct GameVersion
     {
@@ -22,21 +23,21 @@ public class GameManager : SingletonGameObject<GameManager> {
     public class GameConfigInfo
     {
         [SerializeField]
-        private string productName = "UnknownHeroes";
+        private string productName = "DodamFarm";
         [SerializeField]
-        private string bundleName = "com.nexon.unknownheroes";
+        private string bundleName = "com.dodam.farm";
         [SerializeField]
         private GameVersion version = new GameVersion(1, 0, 0);
         [SerializeField]
         private int versionCode = 0;
         [SerializeField]
-        private string androidKeyaliasName = "unknownheroes";
+        private string androidKeyaliasName = "";//"unknownheroes";
         [SerializeField]
-        private string androidKeyaliasPass = "unknownheroes123!@#";
+        private string androidKeyaliasPass = "";//"unknownheroes123!@#";
         [SerializeField]
-        private string androidKeystoreName = "unknownheroes.jks";
+        private string androidKeystoreName = "";//"unknownheroes.jks";
         [SerializeField]
-        private string iosTargetVersion = "8.0"; // major.minor
+        private string iosTargetVersion = "8.0"; // major.minor 
         [SerializeField]
         private bool iosUseBuildHistory = true;
 
@@ -61,6 +62,7 @@ public class GameManager : SingletonGameObject<GameManager> {
             return versionCode.ToString();
         }
     }
+    #endregion
 
     [Header("Game Build Configs:")]
     [SerializeField]

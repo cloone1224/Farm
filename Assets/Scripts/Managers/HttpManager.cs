@@ -5,6 +5,7 @@ public class HttpManager : MonoBehaviour {
 
     #region Singleton
     private static HttpManager instance = null;
+    public static HttpManager Instance { get { return instance; } }
 
     void Awake()
     {

@@ -6,6 +6,7 @@ public class BuildingManager : MonoBehaviour {
 
     #region Singleton
     private static BuildingManager instance = null;
+    public static BuildingManager Instance { get { return instance; } }
 
     void Awake()
     {

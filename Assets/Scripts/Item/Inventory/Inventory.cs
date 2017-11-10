@@ -5,7 +5,8 @@ using UnityEngine;
 public class Inventory : MonoBehaviour {
 
     #region Singleton
-    public static Inventory instance = null;
+    private static Inventory instance = null;
+    public static Inventory Instance { get { return instance; } }
 
     void Awake()
     {
